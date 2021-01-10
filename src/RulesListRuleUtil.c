@@ -92,10 +92,12 @@ void RulesListRuleData_Free(RulesListRuleData* data) {
 void RulesListRuleData_PrintDeep(RulesListRuleData* data, FILE* fout, size_t depth, size_t maxDepth, char* indentStr) {
 	fprintf(fout, "(");
 	if(data->rulesLen > 0) {
-		fprintf(fout, "%p", data->rules[0]);
+		Rule_PrintSimpleRulePointer(data->rules[0], fout);
+		//fprintf(fout, "%p", data->rules[0]);
 	}
 	for(size_t i = 1; i < data->rulesLen; i++) {
-		fprintf(fout, ", %p", data->rules[i]);
+		fprintf(fout, ", ");
+		Rule_PrintSimpleRulePointer(data->rules[i], fout);
 	}
 	fprintf(fout, ")");
 

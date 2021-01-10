@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
+#include <math.h>
 #include "ParseFramework.h"
 #include "AlphabetParseRule.h"
 #include "OptionListParseRule.h"
@@ -82,9 +84,12 @@ ParseRule* getSchemeSpaceForNewRule(ParseScheme* scheme) {
 	// Ok. It is now guaranteed that there is space for the new rule.
 	scheme->numRules++;
 
-	// Null initialize the space
-	//scheme->rules[scheme->numRules - 1].type = PARSE_RULE_NO_ALLOCATED_DATA;
-	scheme->rules[scheme->numRules - 1].wasForwardDeclaration = false;
+	// Initialize the space to default values
+	scheme->rules[scheme->numRules - 1] = (ParseRule) {
+		.ruleType = PARSE_RULE_NO_TYPE,
+		.wasForwardDeclaration = false,
+		.scheme = scheme
+	};
 
 	// return a pointer to the space
 	return &(scheme->rules[scheme->numRules - 1]);
@@ -176,17 +181,28 @@ ParseResult Rule_Parse(ParseRule* rule, char* str, ParseResult* result_ret) {
 	}
 }
 
+void Rule_PrintSimpleRulePointer(ParseRule* rule, FILE* fout) {
+	if(rule == NULL) {
+		fprintf(fout, "NULL");
+		return;
+	}
+
+	ptrdiff_t ruleOffset = rule - rule->scheme->rules;
+	size_t maxRuleOffset = rule->scheme->numRules;
+
+	int maxRuleOffsetPrintLength = (maxRuleOffset == 0)? 1 : ((int) (log(maxRuleOffset) / log(16))) + 1;
+
+	fprintf(fout, "0x%*lX", maxRuleOffsetPrintLength, ruleOffset);
+}
+
 void Rule_PrintDeep(ParseRule* rule, FILE* fout, size_t depth, size_t maxDepth, char* indentStr) {
 	for(size_t i = 0; i < depth; i++) {
 		fprintf(fout, "%s", indentStr);
 	}
 
-	fprintf(fout, "%p: ", rule);
-
-	if(rule == NULL) {
-		fprintf(fout, "NULL");
-		return;
-	}
+	//fprintf(fout, "%p: ", rule);
+	Rule_PrintSimpleRulePointer(rule, fout);
+	fprintf(fout, ": ");
 
 	if(rule->wasForwardDeclaration) {
 		fprintf(fout, "(forward) ");
