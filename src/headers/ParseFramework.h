@@ -35,30 +35,6 @@ typedef struct {
 // Other defs...
 // =================================
 
-typedef enum {
-	PARSE_RULE_ALPHABET,
-	PARSE_RULE_OPTION_LIST,
-	PARSE_RULE_SEQUENCE,
-	PARSE_RULE_FORWARD_DECLARED,
-	PARSE_RULE_STRING
-} ParseRuleType;
-
-struct ParseRule_s {
-	// It's generally a good idea to only set a new rule's type *after* you have allocated its data.
-	// This will help avoid bugs where we try to free data that hasn't been allocated
-	ParseRuleType ruleType;
-
-	bool wasForwardDeclaration;
-
-	union {
-		AlphabetParseRule* alphabetRule;
-		OptionListParseRule* optionListRule;
-		SequenceParseRule* sequenceRule;
-		StringParseRule* stringRule;
-	};
-};
-
-
 typedef struct {
 	ParseRule* rules;
 	size_t numRules;
@@ -77,6 +53,36 @@ typedef struct {
 
 	size_t numUnresolvedForwardRules;
 } ParseScheme;
+
+
+typedef enum {
+	PARSE_RULE_NO_TYPE,
+	PARSE_RULE_ALPHABET,
+	PARSE_RULE_OPTION_LIST,
+	PARSE_RULE_SEQUENCE,
+	PARSE_RULE_FORWARD_DECLARED,
+	PARSE_RULE_STRING
+} ParseRuleType;
+
+struct ParseRule_s {
+	// It's generally a good idea to only set a new rule's type *after* you have allocated its data.
+	// This will help avoid bugs where we try to free data that hasn't been allocated
+	ParseRuleType ruleType;
+
+	bool wasForwardDeclaration;
+
+	ParseScheme* scheme;
+
+	union {
+		AlphabetParseRule* alphabetRule;
+		OptionListParseRule* optionListRule;
+		SequenceParseRule* sequenceRule;
+		StringParseRule* stringRule;
+	};
+};
+
+
+
 
 
 typedef struct {
@@ -100,6 +106,7 @@ void Rule_Free(ParseRule* rule);
 
 ParseResult Rule_Parse(ParseRule* rule, char* str, ParseResult* result_ret);
 
+void Rule_PrintSimpleRulePointer(ParseRule* rule, FILE* fout);
 void Rule_PrintDeep(ParseRule* rule, FILE* fout, size_t depth, size_t maxDepth, char* indentStr);
 void Rule_Print(ParseRule* rule, FILE* fout);
 
