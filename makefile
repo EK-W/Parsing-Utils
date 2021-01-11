@@ -1,4 +1,4 @@
-FILENAMES = AlphabetParseRule OptionListParseRule ParseFramework RulesListRuleUtil SequenceParseRule StringParseRule ForwardParseRule
+FILENAMES = AlphabetParseRule OptionListParseRule ParseFramework RulesListRuleUtil SequenceParseRule StringParseRule ForwardParseRule OptionalParseRule
 HEADERS = $(addprefix src/headers/,$(addsuffix .h,$(FILENAMES)))
 CFILES = $(addprefix src/,$(addsuffix .c,$(FILENAMES)))
 

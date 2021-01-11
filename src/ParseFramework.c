@@ -9,6 +9,7 @@
 #include "SequenceParseRule.h"
 #include "StringParseRule.h"
 #include "ForwardParseRule.h"
+#include "OptionalParseRule.h"
 
 const size_t PARSE_SCHEME_BUFFER_LENGTH = 100;
 
@@ -148,6 +149,10 @@ void Rule_Free(ParseRule* rule) {
 			StringRule_Free(rule->stringRule);
 			rule->stringRule = NULL;
 			break;
+		case PARSE_RULE_OPTIONAL:
+			OptionalRule_Free(rule->optionalRule);
+			rule->optionalRule = NULL;
+			break;
 		default:
 			fprintf(stderr, "Error: I don't know how to free that type of parse rule.\n");
 			break;
@@ -175,6 +180,8 @@ ParseResult Rule_Parse(ParseRule* rule, char* str, ParseResult* result_ret) {
 				"Make sure to eventually call Rule_SetForwardRuleValue for every forward rule that you declare.\n"
 			);
 			return setParseResult(result_ret, false, NULL, 0);
+		case PARSE_RULE_OPTIONAL:
+			return OptionalRule_Parse(rule->optionalRule, str, result_ret);
 		default:
 			fprintf(stderr, "Error: I don't know how to parse using that rule.\n");
 			return setParseResult(result_ret, false, NULL, 0);
@@ -192,7 +199,7 @@ void Rule_PrintSimpleRulePointer(ParseRule* rule, FILE* fout) {
 
 	int maxRuleOffsetPrintLength = (maxRuleOffset == 0)? 1 : ((int) (log(maxRuleOffset) / log(16))) + 1;
 
-	fprintf(fout, "0x%*lX", maxRuleOffsetPrintLength, ruleOffset);
+	fprintf(fout, "0x%0*lX", maxRuleOffsetPrintLength, ruleOffset);
 }
 
 void Rule_PrintDeep(ParseRule* rule, FILE* fout, size_t depth, size_t maxDepth, char* indentStr) {
@@ -223,6 +230,10 @@ void Rule_PrintDeep(ParseRule* rule, FILE* fout, size_t depth, size_t maxDepth, 
 			break;
 		case PARSE_RULE_STRING:
 			StringRule_Print(rule->stringRule, fout);
+			break;
+		case PARSE_RULE_OPTIONAL:
+			OptionalRule_PrintDeep(rule->optionalRule, fout, depth, maxDepth, indentStr);
+			break;
 		default:
 			fprintf(fout, "Unknown Rule Type\n");
 			break;

@@ -30,6 +30,11 @@ typedef struct {
 	size_t stringLen;
 } StringParseRule;
 
+typedef struct {
+	ParseRule* rule;
+	// bool greedy;
+} OptionalParseRule;
+
 
 // =================================
 // Other defs...
@@ -61,7 +66,8 @@ typedef enum {
 	PARSE_RULE_OPTION_LIST,
 	PARSE_RULE_SEQUENCE,
 	PARSE_RULE_FORWARD_DECLARED,
-	PARSE_RULE_STRING
+	PARSE_RULE_STRING,
+	PARSE_RULE_OPTIONAL
 } ParseRuleType;
 
 struct ParseRule_s {
@@ -78,6 +84,7 @@ struct ParseRule_s {
 		OptionListParseRule* optionListRule;
 		SequenceParseRule* sequenceRule;
 		StringParseRule* stringRule;
+		OptionalParseRule* optionalRule;
 	};
 };
 
@@ -126,5 +133,6 @@ ParseRule* ForwardRule_SetValue(ParseScheme* scheme, ParseRule* forwardRule, Par
 ParseRule* createOptionListRule(ParseScheme* scheme, ...);
 ParseRule* createSequenceRule(ParseScheme* scheme, ...);
 ParseRule* StringRule_Create(ParseScheme* scheme, char* str);
+ParseRule* OptionalRule_Create(ParseScheme* scheme, ParseRule* rule);
 
 #endif
