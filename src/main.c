@@ -7,9 +7,8 @@ int main(int argc, char** argv) {
 
 	ParseRule* base10Digit = AlphabetRule_Create(scheme, "0123456789");
 	ParseRule* base10UnsignedIntegerLiteral = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, base10UnsignedIntegerLiteral, OptionListRule_Create(scheme,
-		SequenceRule_Create(scheme, base10Digit, base10UnsignedIntegerLiteral),
-		base10Digit
+	ForwardRule_SetValue(scheme, base10UnsignedIntegerLiteral, SequenceRule_Create(scheme,
+		base10Digit, OptionalRule_Create(scheme, base10UnsignedIntegerLiteral)
 	));
 
 	ParseRule* unsignedIntegerExponentialLiteral = SequenceRule_Create(scheme,
@@ -20,10 +19,11 @@ int main(int argc, char** argv) {
 
 	ParseRule* base16Digit = AlphabetRule_Create(scheme, "0123456789ABCDEFabcdef");
 	ParseRule* base16SignlessInteger = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, base16SignlessInteger, OptionListRule_Create(scheme, 
-		SequenceRule_Create(scheme, base16Digit, base16SignlessInteger),
-		base16Digit
+	ForwardRule_SetValue(scheme, base16SignlessInteger, SequenceRule_Create(scheme,
+		base16Digit, OptionalRule_Create(scheme, base16SignlessInteger)
 	));
+
+
 	ParseRule* base16UnsignedIntegerLiteral = SequenceRule_Create(scheme, 
 		StringRule_Create(scheme, "0x"),
 		base16SignlessInteger
@@ -31,20 +31,20 @@ int main(int argc, char** argv) {
 
 	ParseRule* base2Digit = AlphabetRule_Create(scheme, "01");
 	ParseRule* base2SignlessInteger = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, base2SignlessInteger, OptionListRule_Create(scheme,
-		SequenceRule_Create(scheme, base2Digit, base2SignlessInteger),
-		base2SignlessInteger
+	ForwardRule_SetValue(scheme, base2SignlessInteger, SequenceRule_Create(scheme,
+		base2Digit, OptionalRule_Create(scheme, base2SignlessInteger)
 	));
+
 	ParseRule* base2UnsignedIntegerLiteral = SequenceRule_Create(scheme,
 		StringRule_Create(scheme, "0b"),
 		base2SignlessInteger
 	);
 	
 	ParseRule* unsignedIntegerLiteral = OptionListRule_Create(scheme,
-		base10UnsignedIntegerLiteral,
 		unsignedIntegerExponentialLiteral,
 		base16UnsignedIntegerLiteral,
-		base2UnsignedIntegerLiteral
+		base2UnsignedIntegerLiteral,
+		base10UnsignedIntegerLiteral
 	);
 
 	ParseRule* integerLiteral = SequenceRule_Create(scheme,
@@ -53,9 +53,10 @@ int main(int argc, char** argv) {
 	);
 
 	ParseRule* listOfIntegers = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, listOfIntegers, OptionListRule_Create(scheme, 
-		SequenceRule_Create(scheme, integerLiteral, StringRule_Create(scheme, " "), listOfIntegers),
-		integerLiteral
+	ForwardRule_SetValue(scheme, listOfIntegers, SequenceRule_Create(scheme,
+		integerLiteral, OptionalRule_Create(scheme, SequenceRule_Create(scheme,
+			StringRule_Create(scheme, " "), listOfIntegers
+		))
 	));
 
 	// ParseRule* floatFractionalPart = SequenceRule_Create(scheme, StringRule_Create(scheme, "."), base10UnsignedIntegerLiteral);
@@ -76,6 +77,9 @@ int main(int argc, char** argv) {
 	// 	abcs
 	// ));
 
+	ParseScheme_Print(scheme, stdout);
+	printf("\n=======\n\n");
+
 	if(argc > 1) {
 		ParseResult result;
 		// Rule_Parse(stringFormat, argv[1], &result);
@@ -83,7 +87,7 @@ int main(int argc, char** argv) {
 		printf("Result: %s, %lu\n", result.success? "success" : "failure", result.length);
 	}
 
-	ParseScheme_Print(scheme, stdout);
+	
 
 	ParseScheme_Free(scheme);
 	free(scheme);
