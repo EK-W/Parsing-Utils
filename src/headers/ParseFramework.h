@@ -35,6 +35,12 @@ typedef struct {
 	// bool greedy;
 } OptionalParseRule;
 
+typedef struct {
+	ParseRule* rule;
+	size_t minReps;
+	size_t maxReps;
+} RepeatParseRule;
+
 
 // =================================
 // Other defs...
@@ -67,7 +73,8 @@ typedef enum {
 	PARSE_RULE_SEQUENCE,
 	PARSE_RULE_FORWARD_DECLARED,
 	PARSE_RULE_STRING,
-	PARSE_RULE_OPTIONAL
+	PARSE_RULE_OPTIONAL,
+	PARSE_RULE_REPEAT
 } ParseRuleType;
 
 struct ParseRule_s {
@@ -85,6 +92,7 @@ struct ParseRule_s {
 		SequenceParseRule* sequenceRule;
 		StringParseRule* stringRule;
 		OptionalParseRule* optionalRule;
+		RepeatParseRule* repeatRule;
 	};
 };
 
@@ -134,5 +142,7 @@ ParseRule* createOptionListRule(ParseScheme* scheme, ...);
 ParseRule* createSequenceRule(ParseScheme* scheme, ...);
 ParseRule* StringRule_Create(ParseScheme* scheme, char* str);
 ParseRule* OptionalRule_Create(ParseScheme* scheme, ParseRule* rule);
+ParseRule* RepeatRule_CreateWithBounds(ParseScheme* scheme, size_t minReps, size_t maxReps, ParseRule* rule);
+ParseRule* RepeatRule_Create(ParseScheme* scheme, bool required, ParseRule* rule);
 
 #endif

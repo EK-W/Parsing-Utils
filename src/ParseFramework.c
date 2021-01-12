@@ -10,6 +10,7 @@
 #include "StringParseRule.h"
 #include "ForwardParseRule.h"
 #include "OptionalParseRule.h"
+#include "RepeatParseRule.h"
 
 const size_t PARSE_SCHEME_BUFFER_LENGTH = 100;
 
@@ -153,6 +154,10 @@ void Rule_Free(ParseRule* rule) {
 			OptionalRule_Free(rule->optionalRule);
 			rule->optionalRule = NULL;
 			break;
+		case PARSE_RULE_REPEAT:
+			RepeatRule_Free(rule->repeatRule);
+			rule->repeatRule = NULL;
+			break;
 		default:
 			fprintf(stderr, "Error: I don't know how to free that type of parse rule.\n");
 			break;
@@ -182,6 +187,8 @@ ParseResult Rule_Parse(ParseRule* rule, char* str, ParseResult* result_ret) {
 			return setParseResult(result_ret, false, NULL, 0);
 		case PARSE_RULE_OPTIONAL:
 			return OptionalRule_Parse(rule->optionalRule, str, result_ret);
+		case PARSE_RULE_REPEAT:
+			return RepeatRule_Parse(rule->repeatRule, str, result_ret);
 		default:
 			fprintf(stderr, "Error: I don't know how to parse using that rule.\n");
 			return setParseResult(result_ret, false, NULL, 0);
@@ -233,6 +240,9 @@ void Rule_PrintDeep(ParseRule* rule, FILE* fout, size_t depth, size_t maxDepth, 
 			break;
 		case PARSE_RULE_OPTIONAL:
 			OptionalRule_PrintDeep(rule->optionalRule, fout, depth, maxDepth, indentStr);
+			break;
+		case PARSE_RULE_REPEAT:
+			RepeatRule_PrintDeep(rule->repeatRule, fout, depth, maxDepth, indentStr);
 			break;
 		default:
 			fprintf(fout, "Unknown Rule Type\n");

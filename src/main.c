@@ -6,10 +6,11 @@ int main(int argc, char** argv) {
 	ParseScheme* scheme = ParseScheme_Create();
 
 	ParseRule* base10Digit = AlphabetRule_Create(scheme, "0123456789");
-	ParseRule* base10UnsignedIntegerLiteral = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, base10UnsignedIntegerLiteral, SequenceRule_Create(scheme,
-		base10Digit, OptionalRule_Create(scheme, base10UnsignedIntegerLiteral)
-	));
+	ParseRule* base10UnsignedIntegerLiteral = RepeatRule_Create(scheme, true, base10Digit);
+	// ParseRule* base10UnsignedIntegerLiteral = ForwardRule_Declare(scheme);
+	// ForwardRule_SetValue(scheme, base10UnsignedIntegerLiteral, SequenceRule_Create(scheme,
+	// 	base10Digit, OptionalRule_Create(scheme, base10UnsignedIntegerLiteral)
+	// ));
 
 	ParseRule* unsignedIntegerExponentialLiteral = SequenceRule_Create(scheme,
 		base10UnsignedIntegerLiteral,
@@ -18,28 +19,35 @@ int main(int argc, char** argv) {
 	);
 
 	ParseRule* base16Digit = AlphabetRule_Create(scheme, "0123456789ABCDEFabcdef");
-	ParseRule* base16SignlessInteger = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, base16SignlessInteger, SequenceRule_Create(scheme,
-		base16Digit, OptionalRule_Create(scheme, base16SignlessInteger)
-	));
-
-
-	ParseRule* base16UnsignedIntegerLiteral = SequenceRule_Create(scheme, 
+	// ParseRule* base16SignlessInteger = ForwardRule_Declare(scheme);
+	// ForwardRule_SetValue(scheme, base16SignlessInteger, SequenceRule_Create(scheme,
+	// 	base16Digit, OptionalRule_Create(scheme, base16SignlessInteger)
+	// ));
+	// ParseRule* base16UnsignedIntegerLiteral = SequenceRule_Create(scheme, 
+	// 	StringRule_Create(scheme, "0x"),
+	// 	base16SignlessInteger
+	// );
+	ParseRule* base16UnsignedIntegerLiteral = SequenceRule_Create(scheme,
 		StringRule_Create(scheme, "0x"),
-		base16SignlessInteger
+		RepeatRule_Create(scheme, true, base16Digit)
 	);
 
 	ParseRule* base2Digit = AlphabetRule_Create(scheme, "01");
-	ParseRule* base2SignlessInteger = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, base2SignlessInteger, SequenceRule_Create(scheme,
-		base2Digit, OptionalRule_Create(scheme, base2SignlessInteger)
-	));
+	// ParseRule* base2SignlessInteger = ForwardRule_Declare(scheme);
+	// ForwardRule_SetValue(scheme, base2SignlessInteger, SequenceRule_Create(scheme,
+	// 	base2Digit, OptionalRule_Create(scheme, base2SignlessInteger)
+	// ));
+
+	// ParseRule* base2UnsignedIntegerLiteral = SequenceRule_Create(scheme,
+	// 	StringRule_Create(scheme, "0b"),
+	// 	base2SignlessInteger
+	// );
 
 	ParseRule* base2UnsignedIntegerLiteral = SequenceRule_Create(scheme,
 		StringRule_Create(scheme, "0b"),
-		base2SignlessInteger
+		RepeatRule_Create(scheme, true, base2Digit)
 	);
-	
+
 	ParseRule* unsignedIntegerLiteral = OptionListRule_Create(scheme,
 		unsignedIntegerExponentialLiteral,
 		base16UnsignedIntegerLiteral,
@@ -52,12 +60,22 @@ int main(int argc, char** argv) {
 		unsignedIntegerLiteral
 	);
 
-	ParseRule* listOfIntegers = ForwardRule_Declare(scheme);
-	ForwardRule_SetValue(scheme, listOfIntegers, SequenceRule_Create(scheme,
-		integerLiteral, OptionalRule_Create(scheme, SequenceRule_Create(scheme,
-			StringRule_Create(scheme, " "), listOfIntegers
+	// ParseRule* listOfIntegers = ForwardRule_Declare(scheme);
+	// ForwardRule_SetValue(scheme, listOfIntegers, SequenceRule_Create(scheme,
+	// 	integerLiteral, OptionalRule_Create(scheme, SequenceRule_Create(scheme,
+	// 		StringRule_Create(scheme, " "), listOfIntegers
+	// 	))
+	// ));
+
+	ParseRule* listOfIntegers = SequenceRule_Create(scheme,
+		integerLiteral,
+		RepeatRule_Create(scheme, false, SequenceRule_Create(scheme,
+			StringRule_Create(scheme, " "),
+			integerLiteral
 		))
-	));
+	);
+
+
 
 	// ParseRule* floatFractionalPart = SequenceRule_Create(scheme, StringRule_Create(scheme, "."), base10UnsignedIntegerLiteral);
 	// ParseRule* positiveFloat = OptionListRule_Create(
