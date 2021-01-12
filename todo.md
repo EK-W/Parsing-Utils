@@ -1,0 +1,11 @@
+- Make scheme not need to be specified for each declaration
+- Make ruleType into a struct that has function pointers for print, printdeep, parse, and free
+- Make the token parse rule type
+	- This requires adding a parameter to the parse function
+- Make ParseRules store their data directly instead of a pointer to their data
+	- This would essentially make schemes only useful for keeping track of allocations. So maybe modularize that functionality in a utility class.
+- Make a caseInsensitive rule type? Or something?
+- Do null checking in the create methods
+- Make string/alphabet rules copy the strings
+- Create an end-of-file rule
+
