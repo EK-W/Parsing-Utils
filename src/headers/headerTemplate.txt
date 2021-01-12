@@ -1,0 +1,23 @@
+#ifndef EKW_PARSER_TEMPLATE_PARSE_RULE_H
+#define EKW_PARSER_TEMPLATE_PARSE_RULE_H
+
+#include <stdio.h>
+#include "ParseFramework.h"
+
+ParseRule* TemplateRule_Create(ParseScheme* scheme, otherArgs);
+
+void TemplateRule_Free(TemplateParseRule* rule);
+
+ParseResult TemplateRule_Parse(TemplateParseRule* rule, char* str, ParseResult* result_ret);
+
+void TemplateRule_Print(TemplateParseRule* rule, FILE* fout);
+
+// Only for rules that contain other rules
+//Prints the rule, and then if depth < maxDepth, prints contained rules on new lines.
+void TemplateRule_PrintDeep(TemplateParseRule* rule, FILE* fout, size_t depth, size_t maxDepth, char* indentStr);
+
+
+// This is here to make sure nobody actually tries to compile this file
+asdfljsdhfkzdjhs
+
+#endif
